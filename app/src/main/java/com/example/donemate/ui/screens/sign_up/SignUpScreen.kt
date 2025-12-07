@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 
 @Composable
-fun SignUpScreen(navigateToSignIn: () -> Unit, vm: SignUpViewModel){
+fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: SignUpViewModel){
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {

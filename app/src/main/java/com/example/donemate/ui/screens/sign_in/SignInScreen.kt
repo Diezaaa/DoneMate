@@ -63,7 +63,7 @@ fun SignInScreen(navigateToSignUp: () -> Unit, vm: SignInViewModel){
                 onClick = {vm.onSignInClick()},
                 modifier = Modifier.width(283.dp)
             ) {
-                Text("Sign up")
+                Text("Sign in")
             }
             Spacer(Modifier.height(8.dp))
             Text(text="Go to sign up",modifier = Modifier.clickable{

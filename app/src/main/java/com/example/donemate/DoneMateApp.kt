@@ -1,6 +1,5 @@
 package com.example.donemate
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -14,10 +13,14 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.donemate.ui.screens.add.AddScreen
+import com.example.donemate.ui.screens.add.AddViewModel
 import com.example.donemate.ui.screens.sign_in.SignInScreen
 import com.example.donemate.ui.screens.sign_in.SignInViewModel
 import com.example.donemate.ui.screens.sign_up.SignUpScreen
 import com.example.donemate.ui.screens.sign_up.SignUpViewModel
+import com.example.donemate.ui.screens.task.EditScreen
+import com.example.donemate.ui.screens.task.EditViewModel
 import com.example.donemate.ui.screens.tasks.TasksScreen
 import com.example.donemate.ui.screens.tasks.TasksViewModel
 import com.example.donemate.ui.theme.DoneMateTheme
@@ -32,6 +35,12 @@ data object SignIn : NavKey
 
 @Serializable
 data object Tasks : NavKey
+
+@Serializable
+data class Edit(val id: String) : NavKey
+
+@Serializable
+data object Add : NavKey
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -63,7 +72,20 @@ fun DoneMateApp() {
                 }
                 entry<Tasks> {
                     val viewModel = hiltViewModel<TasksViewModel>()
-                    TasksScreen(vm = viewModel)
+                    TasksScreen(navigateToAdd = { backStack.add(Add) }, navigateToEdit = { taskId -> backStack.add(Edit(taskId)) }, vm = viewModel)
+                }
+                entry<Edit> { task ->
+                    val vm = hiltViewModel<EditViewModel>()
+                    EditScreen(
+                        id = task.id,
+                        vm = vm
+                    )
+                }
+                entry<Add> {
+                    val vm = hiltViewModel<AddViewModel>()
+                    AddScreen(
+                        vm = vm
+                    )
                 }
             }
         )

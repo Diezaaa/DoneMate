@@ -65,7 +65,7 @@ private val TOP_LEVEL_ROUTES : List<TopLevelRoute> = listOf(Tasks, Account)
 @Composable
 fun DoneMateApp() {
     DoneMateTheme {
-        val backStack = rememberNavBackStack(Tasks)
+        val backStack = rememberNavBackStack(SignIn)
         val viewModelDecorator = rememberViewModelStoreNavEntryDecorator<NavKey>()
         val saveableStateDecorator = rememberSaveableStateHolderNavEntryDecorator<NavKey>()
         val currentDestination = backStack.lastOrNull()
@@ -117,7 +117,8 @@ fun DoneMateApp() {
                     }
                     entry<SignIn> {
                         val viewModel = hiltViewModel<SignInViewModel>()
-                        SignInScreen(navigateToSignUp = { backStack.add(SignUp) }, navigateToSuccess = {
+                        SignInScreen(navigateToSignUp = { backStack.add(SignUp) },
+                            navigateToTasks = {
                             backStack.clear()
                             backStack.add(Tasks)
                         }, vm = viewModel)
@@ -148,6 +149,9 @@ fun DoneMateApp() {
                         AccountScreen(
                             navigateToSignIn = {backStack.clear()
                                                backStack.add(SignIn)},
+                            navigateToSignUp = {
+                                backStack.add(SignUp)
+                            },
                             vm = vm,
                         )
                     }

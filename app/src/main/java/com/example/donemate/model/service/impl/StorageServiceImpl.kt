@@ -28,7 +28,7 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
             auth.currentUser.flatMapLatest { user ->
                 firestore
                     .collection("tasks")
-                    .whereEqualTo("userId", user.id)
+                    .whereEqualTo("userId", user?.id)
                     .dataObjects()
             }
 

@@ -23,16 +23,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.donemate.model.User
 import kotlinx.coroutines.delay
 
 @Composable
 fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: SignUpViewModel){
     val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val currentUser by vm.currentUser.collectAsStateWithLifecycle(null)
+    val navigateToTasks by vm.navigateToTasks.collectAsStateWithLifecycle()
 
-    LaunchedEffect(true) {
-        vm.onAppStart()
+    LaunchedEffect(navigateToTasks) {
+        if(navigateToTasks)
+        {
+            navigateToTasks()
+        }
     }
-
     Row(modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center) {
@@ -61,11 +66,14 @@ fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: 
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = {vm.onSignUpClick()},
+                onClick = {vm.onSignUpClick(currentUser?.isAnonymous ?: false)},
                 modifier = Modifier.width(283.dp)
             ) {
                 Text("Sign up")
             }
+            Text(text = "Continue without account", modifier = Modifier.clickable {
+                vm.onContinueAnonymously()
+            })
             Spacer(Modifier.height(8.dp))
             Text(text="Go to sign in",modifier = Modifier.clickable{
                 navigateToSignIn()

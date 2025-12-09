@@ -8,9 +8,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -20,14 +25,14 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override val currentUserId: String
         get() = auth.currentUser?.uid.orEmpty()
 
-    override val hasUser: Boolean
-        get() = auth.currentUser != null
+    override val hasUser: Flow<Boolean>
+        get() = currentUser.map { it != null }
 
-    override val currentUser: Flow<User>
+    override val currentUser: Flow<User?>
         get() = callbackFlow {
             val listener =
                 FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser?.let { User(it.uid, it.isAnonymous, it.email) } ?: User())
+                    this.trySend(auth.currentUser?.let { User(it.uid, it.isAnonymous, it.email) } ?:null)
                 }
             auth.addAuthStateListener(listener)
             awaitClose { auth.removeAuthStateListener(listener) }
@@ -65,13 +70,10 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
             auth.currentUser!!.delete()
         }
         auth.signOut()
-
-        // Sign the user back in anonymously.
-        createAnonymousAccount()
     }
 
-    companion object {
-        private const val LINK_ACCOUNT_TRACE = "linkAccount"
+    override suspend fun createAccount(email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password)
     }
 }
 

@@ -37,13 +37,20 @@ class AccountViewModel @Inject constructor(
         null
     )
 
+    private val _hasUser: StateFlow<Boolean> = accountService.hasUser.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        true
+    )
+
+    val hasUser: StateFlow<Boolean> = _hasUser
+
     fun onLogOut(){
         viewModelScope.launch {
             accountService.signOut()
         }
     }
 
-    // BUG: CRAHES BECAUSE THIS ACTION NEEDS CONIRMATION
     fun onDeleteAccount(){
         viewModelScope.launch {
             accountService.deleteAccount()

@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.donemate.model.Progress
 
 @Composable
-fun EditScreen(id: String, vm: EditViewModel) {
+fun EditScreen(id: String, vm: EditViewModel, navigateToTasks: () -> Boolean) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val menuItemData: Map<String, Int> = Progress.entries.associate { it.label to it.value }
     var expanded by remember { mutableStateOf(false) }
@@ -114,7 +114,8 @@ fun EditScreen(id: String, vm: EditViewModel) {
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = {vm.onSaveTask()},
+                onClick = {vm.onSaveTask()
+                    navigateToTasks()},
                 modifier = Modifier.width(283.dp)
             ) {
                 Text("Update")

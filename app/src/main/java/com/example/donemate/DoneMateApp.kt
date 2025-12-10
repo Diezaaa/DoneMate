@@ -36,6 +36,10 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.donemate.ui.screens.account.AccountScreen
 import com.example.donemate.ui.screens.account.AccountViewModel
+import com.example.donemate.ui.screens.link_account.LinkAccountScreen
+import com.example.donemate.ui.screens.link_account.LinkAccountViewModel
+import com.example.donemate.ui.screens.reset_password.ResetPasswordScreen
+import com.example.donemate.ui.screens.reset_password.ResetPasswordViewModel
 
 @Serializable
 data object SignUp : NavKey
@@ -52,11 +56,17 @@ data class Edit(val id: String) : NavKey
 @Serializable
 data object Add : NavKey
 
+@Serializable
+data object LinkAccount : NavKey
+
 private sealed interface TopLevelRoute : NavKey {
     val icon: ImageVector
 }
 @Serializable
 data object Account : TopLevelRoute { override val icon = Icons.Default.AccountCircle }
+
+@Serializable
+data object ResetPassword : NavKey
 
 private val TOP_LEVEL_ROUTES : List<TopLevelRoute> = listOf(Tasks, Account)
 
@@ -121,7 +131,10 @@ fun DoneMateApp() {
                             navigateToTasks = {
                             backStack.clear()
                             backStack.add(Tasks)
-                        }, vm = viewModel)
+                        }, vm = viewModel,
+                            navigateToResetPassword ={
+                                backStack.add(ResetPassword)
+                            })
                     }
                     entry<Tasks> {
                         val viewModel = hiltViewModel<TasksViewModel>()
@@ -134,6 +147,8 @@ fun DoneMateApp() {
                     entry<Edit> { task ->
                         val vm = hiltViewModel<EditViewModel>()
                         EditScreen(
+                            navigateToTasks = {backStack.removeLastOrNull()
+                                              backStack.add(Tasks)},
                             id = task.id,
                             vm = vm
                         )
@@ -141,6 +156,8 @@ fun DoneMateApp() {
                     entry<Add> {
                         val vm = hiltViewModel<AddViewModel>()
                         AddScreen(
+                            navigateToTasks = {backStack.removeLastOrNull()
+                                backStack.add(Tasks)},
                             vm = vm
                         )
                     }
@@ -149,10 +166,29 @@ fun DoneMateApp() {
                         AccountScreen(
                             navigateToSignIn = {backStack.clear()
                                                backStack.add(SignIn)},
-                            navigateToSignUp = {
-                                backStack.add(SignUp)
+                            navigateToLinkAccount = {
+                                backStack.add(LinkAccount)
                             },
                             vm = vm,
+                        )
+                    }
+                    entry<LinkAccount> {
+                        val vm = hiltViewModel<LinkAccountViewModel>()
+                        LinkAccountScreen(
+                            navigateToTasks = {
+                                backStack.clear()
+                                backStack.add(Tasks) },
+                            vm = vm
+                        )
+                    }
+                    entry<ResetPassword> {
+                        val vm = hiltViewModel<ResetPasswordViewModel>()
+                        ResetPasswordScreen(
+                            navigateToSignIn = {
+                                    backStack.removeLastOrNull()
+                                backStack.add(SignIn)
+                                },
+                            vm = vm
                         )
                     }
                 }

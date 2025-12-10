@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,10 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.donemate.model.Progress
-import com.example.donemate.ui.screens.task.EditViewModel
 
 @Composable
-fun AddScreen(vm: AddViewModel) {
+fun AddScreen(vm: AddViewModel, navigateToTasks: () -> Boolean) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val menuItemData: Map<String, Int> = Progress.entries.associate { it.label to it.value }
     var expanded by remember { mutableStateOf(false) }
@@ -110,7 +108,8 @@ fun AddScreen(vm: AddViewModel) {
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = {vm.onSaveTask()},
+                onClick = {vm.onSaveTask()
+                    navigateToTasks()},
                 modifier = Modifier.width(283.dp)
             ) {
                 Text("Create")

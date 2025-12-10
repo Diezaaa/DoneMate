@@ -1,5 +1,6 @@
-package com.example.donemate.ui.screens.sign_up
+package com.example.donemate.ui.screens.link_account
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,43 +9,39 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.donemate.model.User
 import com.example.donemate.model.service.impl.AuthResult
+import com.example.donemate.ui.screens.sign_up.SignUpViewModel
 import kotlinx.coroutines.delay
-import androidx.compose.material3.SnackbarHost
-import kotlinx.coroutines.launch
 
 @Composable
-fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: SignUpViewModel){
+fun LinkAccountScreen(navigateToTasks: () -> Unit, vm: LinkAccountViewModel){
     val uiState by vm.uiState.collectAsStateWithLifecycle()
-    val isLogged by vm.hasUser.collectAsStateWithLifecycle(false)
+    val currentUser by vm.currentUser.collectAsStateWithLifecycle(null)
     val authState by vm.authState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -52,13 +49,12 @@ fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: 
             is AuthResult.Success -> {}
             is AuthResult.Error -> snackBarHostState.showSnackbar((authState as AuthResult.Error).message, duration = SnackbarDuration.Indefinite)
         }
-    }
-
-    LaunchedEffect(isLogged) {
-        if(isLogged) {
+        delay(2_000)
+        if(authState is AuthResult.Success) {
             navigateToTasks()
         }
     }
+
 
     Scaffold(
         snackbarHost = {
@@ -77,7 +73,7 @@ fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Sign Up",
+                    "Link account",
                     fontSize = 35.sp
                 )
                 Spacer(Modifier.height(15.dp))
@@ -97,18 +93,11 @@ fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: 
                 Spacer(Modifier.height(8.dp))
 
                 Button(
-                    onClick = { vm.onSignUpClick() },
+                    onClick = { vm.onLinkAccount(currentUser) },
                     modifier = Modifier.width(283.dp)
                 ) {
-                    Text("Sign up")
+                    Text("Link")
                 }
-                Text(text = "Continue without account", modifier = Modifier.clickable {
-                    vm.onContinueAnonymously()
-                })
-                Spacer(Modifier.height(8.dp))
-                Text(text = "Go to sign in", modifier = Modifier.clickable {
-                    navigateToSignIn()
-                })
             }
         }
     }

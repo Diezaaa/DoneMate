@@ -3,6 +3,7 @@ package com.example.donemate.ui.screens.sign_in
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.donemate.model.service.AccountService
+import com.example.donemate.model.service.impl.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,8 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val accountService: AccountService
 ) : ViewModel()  {
+    private val _authState = MutableStateFlow<AuthResult>(AuthResult.NotStarted)
+    val authState: StateFlow<AuthResult> = _authState.asStateFlow()
     private val _uiState = MutableStateFlow(SignInUiState())
     val uiState: StateFlow<SignInUiState> = _uiState.asStateFlow()
 
@@ -36,9 +39,10 @@ class SignInViewModel @Inject constructor(
     }
     fun onSignInClick(){
         viewModelScope.launch {
-            accountService.authenticate(_uiState.value.email, _uiState.value.password)
+            _authState.value = accountService.authenticate(_uiState.value.email, _uiState.value.password)
         }
     }
+
 
     fun onContinueAnonymously() {
         viewModelScope.launch {

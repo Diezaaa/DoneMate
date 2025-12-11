@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.ui.util.trace
 import com.example.donemate.model.User
 import com.example.donemate.model.service.AccountService
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
 import com.google.firebase.auth.EmailAuthProvider
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import com.google.firebase.auth.GoogleAuthProvider
 
 sealed class AuthResult {
     object NotStarted : AuthResult()
@@ -100,6 +102,15 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         } catch (e: Exception) {
             AuthResult.Error("Something went wrong")
         }
+    }
+
+    override suspend fun linkAccountWithGoogle(idToken: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun signInWithGoogle(idToken: String) {
+        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(firebaseCredential).await()
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.donemate.ui.screens.sign_up
 
-import android.widget.Toast
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import com.example.donemate.R
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -21,21 +24,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.donemate.model.User
 import com.example.donemate.model.service.impl.AuthResult
-import kotlinx.coroutines.delay
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.credentials.Credential
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
+import com.example.donemate.ui.common.AuthenticationButton
+import com.example.donemate.ui.common.launchCredManBottomSheet
+import com.example.donemate.ui.theme.Purple40
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,6 +56,12 @@ fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: 
     val authState by vm.authState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        launchCredManBottomSheet(context, false) { result ->
+            vm.onSignUpWithGoogle(result)
+        }
+    }
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -102,6 +119,13 @@ fun SignUpScreen(navigateToTasks: () -> Unit, navigateToSignIn: () -> Unit, vm: 
                 ) {
                     Text("Sign up")
                 }
+                Spacer(Modifier.height(8.dp))
+                Text("OR")
+                Spacer(Modifier.height(8.dp))
+                AuthenticationButton("Sign up with Google") { credential ->
+                    vm.onSignUpWithGoogle(credential)
+                }
+                Spacer(Modifier.height(8.dp))
                 Text(text = "Continue without account", modifier = Modifier.clickable {
                     vm.onContinueAnonymously()
                 })

@@ -14,4 +14,7 @@ interface AccountService {
     suspend fun signOut()
     suspend fun resetPassword(email: String): AuthResult
     suspend fun createAccount(email: String, password: String): AuthResult
+    suspend fun linkAccountWithGoogle(idToken: String)
+    suspend fun signInWithGoogle(idToken: String)
+
 }

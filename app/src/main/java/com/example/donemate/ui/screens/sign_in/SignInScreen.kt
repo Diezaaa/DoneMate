@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GMobiledata
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -28,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.donemate.model.service.impl.AuthResult
+import com.example.donemate.ui.common.AuthenticationButton
+import com.example.donemate.ui.common.launchCredManBottomSheet
+import kotlinx.coroutines.delay
 
 @Composable
 fun SignInScreen(
@@ -41,6 +47,12 @@ fun SignInScreen(
     val authState by vm.authState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        launchCredManBottomSheet(context) { result ->
+            vm.onSignInWithGoogle(result)
+        }
+    }
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -97,6 +109,12 @@ fun SignInScreen(
                     modifier = Modifier.width(283.dp)
                 ) {
                     Text("Sign in")
+                }
+                Spacer(Modifier.height(8.dp))
+                Text("OR")
+                Spacer(Modifier.height(8.dp))
+                AuthenticationButton("Sign in with Google") { credential ->
+                    vm.onSignInWithGoogle(credential)
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(text = "Forgot password?", modifier = Modifier.clickable {

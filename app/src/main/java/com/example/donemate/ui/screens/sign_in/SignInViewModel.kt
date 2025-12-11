@@ -1,9 +1,14 @@
 package com.example.donemate.ui.screens.sign_in
 
+import android.util.Log
+import androidx.credentials.Credential
+import androidx.credentials.CustomCredential
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.donemate.model.service.AccountService
 import com.example.donemate.model.service.impl.AuthResult
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +47,16 @@ class SignInViewModel @Inject constructor(
             _authState.value = accountService.authenticate(_uiState.value.email, _uiState.value.password)
         }
     }
-
+    fun onSignInWithGoogle(credential: Credential) {
+        viewModelScope.launch {
+            if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                accountService.signInWithGoogle(googleIdTokenCredential.idToken)
+            } else {
+                Log.e("ERROR_TAG", "Er")
+            }
+        }
+    }
 
     fun onContinueAnonymously() {
         viewModelScope.launch {

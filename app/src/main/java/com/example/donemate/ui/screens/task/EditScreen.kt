@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +41,7 @@ import com.example.donemate.model.Progress
 fun EditScreen(id: String, vm: EditViewModel, navigateToTasks: () -> Boolean) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val menuItemData: Map<String, Int> = Progress.entries.associate { it.label to it.value }
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {

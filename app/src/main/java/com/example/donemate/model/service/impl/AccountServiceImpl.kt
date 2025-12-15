@@ -112,7 +112,5 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(firebaseCredential).await()
     }
-
-
 }
 

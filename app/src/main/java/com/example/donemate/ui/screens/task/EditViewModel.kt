@@ -19,20 +19,25 @@ class EditViewModel @Inject constructor(
 ) : ViewModel()  {
     private val _uiState = MutableStateFlow(Task())
     val uiState: StateFlow<Task> = _uiState.asStateFlow()
-
+    var hasLoaded = false
 
     fun loadTask(id: String) {
-        viewModelScope.launch {
-            // Run I/O safely on the IO dispatcher
-            val task = withContext(Dispatchers.IO) {
-                storageService.getTask(id)
+        if (!hasLoaded) {
+            hasLoaded = true
+            viewModelScope.launch {
+                // Run I/O safely on the IO dispatcher
+                val task = withContext(Dispatchers.IO) {
+                    storageService.getTask(id)
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    id = task?.id ?: "",
+                    progress = task?.progress ?: 0,
+                    title = task?.title ?: "",
+                    userId = task?.userId ?: ""
+                )
+
             }
-
-            _uiState.value = _uiState.value.copy(id = task?.id ?: "",
-                                                    progress = task?.progress ?: 0,
-                                                    title = task?.title ?: "",
-                                                    userId = task?.userId ?: "")
-
         }
     }
 
